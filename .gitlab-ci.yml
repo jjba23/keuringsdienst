@@ -1,0 +1,9 @@
+stages:
+  - build
+  
+build-job:
+  stage: build
+  image: nixos/nix
+  script:
+    - nix --extra-experimental-features 'nix-command flakes' --accept-flake-config build
+    - nix --extra-experimental-features 'nix-command flakes' --accept-flake-config run .#test

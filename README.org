@@ -1,0 +1,113 @@
+#+author: Josep Bigorra
+#+email: jjbigorra@gmail.com
+#+options: toc:nil
+
+* Keuringsdienst (van Waarde)
+
+#+begin_html
+<div>
+  <img alt="haskell" src="https://gitlab.com/jjba-projects/honeybadger/-/raw/master/dist/haskell.png?ref_type=heads"/>
+  <img alt="haskell" src="https://gitlab.com/jjba-projects/honeybadger/-/raw/master/dist/gnu-gpl-v3.png?ref_type=heads"/>
+  <a href="https://gitlab.com/jjba-projects/antikythera/-/commits/master"><img alt="pipeline status" src="https://gitlab.com/jjba-projects/keuringsdienst/badges/master/pipeline.svg" /></a>
+</div>
+#+end_html
+
+If you know, you know. Data validation in Haskell that is composable, made easy and clean.
+
+See [[https://hackage.haskell.org/package/keuringsdienst][the keuringsdienst package on Hackage for technical Haskell Haddock documentation]]. Licensed under the GNU General Public License v3 or later.
+
+Data validation rules that are easy to write and serve as documentation of your data as well.
+
+Therefore, data validations *SHOULD* live next to your data models.
+
+
+** Context and motivation
+
+There exist many data validation packages, in Haskell and other languages, but so far I have never found something that was flexible but powerful enough for my needs.
+
+I based myself on ~Semigroup~ and ~Monoid~ operations, and attempted to make validation rules that are easy to write, read, compose and maintain.
+
+See an example, from my music website WikiMusic.
+
+#+begin_src haskell
+  validateEntity x =
+    (identifier x) |?| isTextOfLength 36
+    <> (displayName x) |?| (isNonEmptyText <> isTextSmallerThanOrEqual 120)
+#+end_src
+
+Imagine a simple data model (record) for a music artist:
+
+#+begin_src haskell
+  data Artist = Artist
+  { identifier :: Text,
+    displayName :: Text,
+    createdBy :: Text,
+    visibilityStatus :: Int,
+    approvedBy :: Maybe Text,
+    createdAt :: UTCTime,
+    lastEditedAt :: Maybe UTCTime,
+    artworks :: Map Text ArtistArtwork,
+    comments :: Map Text ArtistComment,
+    opinions :: Map Text ArtistOpinion,
+    spotifyUrl :: Maybe Text
+  }
+  deriving (Eq, Show, Generic)
+#+end_src
+
+** Defining validations
+      
+Of course for all this to work, you need some imports:
+#+begin_src haskell
+  import Keuringsdienst
+  import Keuringsdienst.Helpers
+#+end_src
+
+You can define a validation function for ~Artist~ by composing validation results and rules. Validation results are the result of applying rules to certain data and can be composed with ~<>~ since they are ~Monoid~. Rules can also be composed (~AND~) with ~<>~ since they are also ~Monoid~ and can be ~OR~'ed with the ~*||*~ operator, a.k.a ~ofDitOfDat~.
+
+#+begin_src haskell
+  validateArtist :: Artist -> ValidationResult
+  validateArtist x =
+    (identifier x) |?| isTextOfLength 36
+      <> (displayName x) |?| (isNonEmptyText <> isTextSmallerThanOrEqual 120)
+      <> (createdBy x) |?| isTextOfLength 36
+      <> (visibilityStatus x) |?| isPositiveOrZero
+      <> (approvedBy x) |??| isTextOfLength 36
+      <> (spotifyUrl x) |??| isNonEmptyText
+#+end_src
+
+** What is a ValidationResult
+
+#+begin_src haskell
+  type ErrMsg = Text
+
+  data Validation err
+    = Success
+    | Failure err
+    deriving (Eq, Show, Generic, FromJSON, ToJSON)
+
+  type ValidationResult = Validation [ErrMsg]
+#+end_src
+
+** Optics / Lenses
+
+If you like ~Optics~ and lenses as I do, you are fully free to use it:
+
+#+begin_src haskell
+  validateArtist :: Artist -> ValidationResult
+  validateArtist x =
+    (x ^. #identifier) |?| isTextOfLength 36
+      <> (x ^. #displayName) |?| (isNonEmptyText <> isTextSmallerThanOrEqual 120)
+      <> (x ^. #createdBy) |?| isTextOfLength 36
+      <> (x ^. #visibilityStatus) |?| isPositiveOrZero
+      <> (x ^. #approvedBy) |??| isTextOfLength 36
+      <> (x ^. #spotifyUrl) |??| isNonEmptyText
+#+end_src
+
+
+** Running the tests
+
+#+begin_src bash
+make unit-test
+#+end_src
+
+
