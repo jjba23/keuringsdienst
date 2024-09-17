@@ -15,7 +15,7 @@
           (final: prev: {
             keuringsdienstProject = final.haskell-nix.project' {
               src = ./.;
-              compiler-nix-name = "ghc98";
+              compiler-nix-name = "ghc96";
               shell.tools = {
                 cabal = { };
                 #hlint = {};
@@ -44,7 +44,8 @@
         legacyPackages = pkgs;
 
         packages.default = flake.packages."keuringsdienst:lib:keuringsdienst";
-        packages.test = flake.packages."keuringsdienst:test:spec";
+        packages.test =
+          flake.packages."keuringsdienst:test:keuringsdienst-spec";
       });
 
   nixConfig = {
