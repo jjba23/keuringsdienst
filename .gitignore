@@ -1,5 +1,4 @@
 .stack-work/
-stack.yaml.lock
 .HTF/
 dist-newstyle/
 .direnv/
