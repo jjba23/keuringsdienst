@@ -1,10 +1,10 @@
 cabal-version: 1.12
 name: keuringsdienst
-version: 1.0.0.7
+version: 1.0.0.8
 description:    See README at https://github.com/jjba23/keuringsdienst
 maintainer:     Josep Bigorra <jjbigorra@gmail.com>
 build-type:     Simple
-license:        GPL-3
+license:        LGPL-3
 license-file: COPYING
                 
          
