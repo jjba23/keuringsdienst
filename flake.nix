@@ -30,6 +30,7 @@
                 ormolu
                 nixfmt
                 statix
+                stack
                 deadnix
               ];
             };
