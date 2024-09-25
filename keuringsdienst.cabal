@@ -1,12 +1,13 @@
 cabal-version: 1.12
 name: keuringsdienst
-version: 1.0.0.12
-description:    See README at https://github.com/jjba23/keuringsdienst
+version: 1.0.2.0
 maintainer:     Josep Bigorra <jjbigorra@gmail.com>
 build-type:     Simple
 license:        LGPL-3
 license-file: COPYING
-                
+synopsis: Data validation in Haskell that is composable, made easy and clean.              
+description:    See README at https://github.com/jjba23/keuringsdienst
+homepage: https://github.com/jjba23/keuringsdienst
          
 library
   exposed-modules:
